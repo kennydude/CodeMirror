@@ -5,7 +5,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
   // Tokenizer
 
   var keywords = function(){
-    function kw(type) {return {type: type, style: "keyword"};}
+    function kw(type) {return {type: type, style: "keyword J" + type};}
     var A = kw("keyword a"), B = kw("keyword b"), C = kw("keyword c");
     var operator = kw("operator"), atom = {type: "atom", style: "atom"};
     return {
@@ -18,6 +18,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
       "true": atom, "false": atom, "null": atom, "undefined": atom, "NaN": atom, "Infinity": atom
     };
   }();
+  var lastKeyword = '';
 
   var isOperatorChar = /[+\-*&%=<>!?|]/;
 
@@ -87,8 +88,14 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
     else {
       stream.eatWhile(/[\w\$_]/);
       var word = stream.current(), known = keywords.propertyIsEnumerable(word) && keywords[word];
+      if(known){ lastKeyword = word; }
+      else{
+        exClass = '';
+        if(lastKeyword == "function"){ exClass = ' fDef'; }
+        lastKeyword = '';
+      }
       return (known && state.kwAllowed) ? ret(known.type, known.style, word) :
-                     ret("variable", "variable", word);
+                     ret("variable" + exClass, "variable" + exClass, word);
     }
   }
 

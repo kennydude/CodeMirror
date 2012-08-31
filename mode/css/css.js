@@ -71,7 +71,7 @@ CodeMirror.defineMode("css", function(config) {
     }
     else if (ch == "#") {
       stream.eatWhile(/[\w\\\-]/);
-      return ret("atom", "hash");
+      return ret("atom color", "hash");
     }
     else if (ch == "!") {
       stream.match(/^\s*\w*/);
@@ -119,14 +119,15 @@ CodeMirror.defineMode("css", function(config) {
 
   function tokenString(quote) {
     return function(stream, state) {
-      var escaped = false, ch;
+      var escaped = false, ch, t ='';
       while ((ch = stream.next()) != null) {
+        if (ch == '.'){ t = ' url'; }
         if (ch == quote && !escaped)
           break;
         escaped = !escaped && ch == "\\";
       }
       if (!escaped) state.tokenize = tokenBase;
-      return ret("string", "string");
+      return ret("string" + t, "string" + t);
     };
   }
 
